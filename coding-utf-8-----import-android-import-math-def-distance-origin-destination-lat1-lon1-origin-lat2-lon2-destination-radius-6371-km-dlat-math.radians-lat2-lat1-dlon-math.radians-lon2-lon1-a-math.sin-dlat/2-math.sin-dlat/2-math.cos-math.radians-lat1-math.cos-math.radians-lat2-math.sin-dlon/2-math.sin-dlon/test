@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+import android
+import math
+
+def distance(origin, destination):
+    lat1, lon1 = origin
+    lat2, lon2 = destination
+    radius = 6371 # km
+
+    dlat = math.radians(lat2-lat1)
+    dlon = math.radians(lon2-lon1)
+    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = radius * c
+
+    return d
+
+droid = android.Android()
+droid.startLocating(1000,1)
+response=droid.eventWait().result
+lat = response["data"]["network"]["latitude"]
+lon = response["data"]["network"]["longitude"]
+
+droid.stopLocating()
+
+
+lat1 = lat; lat2 = 41.3865744; lon1 = lon; lon2 = 2.189419
+koord = droid.geocode(lat2, lon2).result
+orszag = koord[0][u"country_name"]
+varos = koord[0][u"locality"]
+
+tavolsag = distance((lat1, lon1), (lat2, lon2))
+droid.makeToast(varos + ", " + orszag + u"\ntávolság: " + str(tavolsag) + " km")
